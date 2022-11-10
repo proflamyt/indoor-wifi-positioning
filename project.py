@@ -6,11 +6,8 @@ import sys
 def main():
     get_aps()
 
-def function_1():
-    ...
 
-
-def get():
+def calculate_abs():
     ...
 
 
