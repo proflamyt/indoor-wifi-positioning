@@ -23,11 +23,14 @@ def get_wirelessInfo():
         scan_out_data = {}
         for bs in bsss:
             trigger += 1
-            scan_out_data[f'Address{trigger}'] = {
+            scan_out_data[bs.ssid.decode('utf8')] = {
                 "ap_mac": bs.bssid,
                 "RSSI": bs.get_rssi()
             }
+    
     return scan_out_data
+
+
 
 
 
