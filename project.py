@@ -13,7 +13,7 @@ def main():
     print(loc)
 
 
-def calculate_abs(aps):
+def calculate_abs(aps: list) -> int:
     distance = 0
     for i in aps:
         ap_distance = get_distance(i) 
@@ -65,11 +65,11 @@ def get_aps(platform, interface='wlan0'):
                 split_line[4] == "Y"), "CC": split_line[5], "security": split_line[6]}
             scan_out_data[split_line[1]] = line_data
         return scan_out_data
+    
+    raise NotImplementedError("Platform not found")
 
-
-def get_distance(ap_mac):
+def get_distance(ap_mac: str ):
     nearby_aps = get_aps(get_os())
-    print(nearby_aps)
     if ap_mac not in nearby_aps.keys():
         print("Specified Access Point Not Found!")
         return -1  # Using -1 top indicate an error
@@ -79,9 +79,13 @@ def get_distance(ap_mac):
     return distance
 
 
-def compute_distance(ap_rssi):
-    distance = -log10(3*((ap_rssi + 81)**9.9)) + 19.7
-    return distance
+def compute_distance(ap_rssi: int) -> int:
+    try:
+        assert ap_rssi > 0
+        distance = -log10(3*((ap_rssi + 81)**9.9)) + 19.7
+        return distance
+    except :
+        raise ValueError("Invalid RSSI")
 
 
 def map_user():
