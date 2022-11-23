@@ -2,23 +2,33 @@ import subprocess
 from math import log10
 import sys
 from wincode import get_wirelessInfo
+import argparse
 
-ACCESS_POINTS = [
-    'Galaxy A22E697'
-]
+my_parser = argparse.ArgumentParser(description='Get The distace between each specified access points')
 
+# Add the arguments
+my_parser.add_argument('-l',
+                        '--list', 
+                        nargs='+',
+                        help='specify access points , seperated by commas', required=True)
 
 def main():
-    loc = calculate_abs(ACCESS_POINTS)
+    
+    loc = calculate_abs(get_known_ap())
     print(loc)
+
+def get_known_ap()-> list:
+    args = my_parser.parse_args()
+    access_points = args.list
+    return access_points
 
 
 def calculate_abs(aps: list) -> int:
-    distance = 0
+    distance = {}
     for i in aps:
         ap_distance = get_distance(i) 
         if ap_distance != -1:
-            distance += ap_distance 
+            distance[i] = ap_distance
     return distance
 
 
@@ -38,7 +48,6 @@ def get_aps(platform, interface='wlan0'):
         scan_out, scan_err = scan_cmd.communicate()
         scan_out_data = {}
         scan_out_lines = str(scan_out).split(r'\n')[1:-2]
-        trigger = 0
         for each_line in scan_out_lines:
             if 'Address' in each_line:
                 bssid = each_line.split(': ')[0].strip()
@@ -71,7 +80,7 @@ def get_aps(platform, interface='wlan0'):
 def get_distance(ap_mac: str ):
     nearby_aps = get_aps(get_os())
     if ap_mac not in nearby_aps.keys():
-        print("Specified Access Point Not Found!")
+        print(f"{ap_mac} Specified Access Point Not Found!")
         return -1  # Using -1 top indicate an error
     ap_rssi = nearby_aps[ap_mac]["RSSI"]
     distance = compute_distance(ap_rssi)
@@ -81,15 +90,12 @@ def get_distance(ap_mac: str ):
 
 def compute_distance(ap_rssi: int) -> int:
     try:
-        assert ap_rssi > 0
+        assert ap_rssi < 0
         distance = -log10(3*((ap_rssi + 81)**9.9)) + 19.7
         return distance
     except :
         raise ValueError("Invalid RSSI")
 
-
-def map_user():
-    ...
 
 
 if __name__ == "__main__":

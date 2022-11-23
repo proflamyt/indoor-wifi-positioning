@@ -7,10 +7,10 @@ def test_get_os():
 
 
 def test_compute_distance():
-    assert compute_distance(1) == 0.2761216066815422
+    assert compute_distance(-64) ==  7.041434423635424
     with raises(ValueError):
-        compute_distance(0)
-        compute_distance(-1)
+        compute_distance(1)
+        compute_distance(9)
         compute_distance('ola')
 
 
