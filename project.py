@@ -4,20 +4,23 @@ import sys
 from wincode import get_wirelessInfo
 import argparse
 
-my_parser = argparse.ArgumentParser(description='Get The distace between each specified access points')
+my_parser = argparse.ArgumentParser(
+    description='Get The distace between each specified access points')
 
 # Add the arguments
 my_parser.add_argument('-l',
-                        '--list', 
-                        nargs='+',
-                        help='specify access points , seperated by commas', required=True)
+                       '--list',
+                       nargs='+',
+                       help='specify access points , seperated by commas', required=True)
+
 
 def main():
-    
+
     loc = calculate_abs(get_known_ap())
     print(loc)
 
-def get_known_ap()-> list:
+
+def get_known_ap() -> list:
     args = my_parser.parse_args()
     access_points = args.list
     return access_points
@@ -26,7 +29,7 @@ def get_known_ap()-> list:
 def calculate_abs(aps: list) -> int:
     distance = {}
     for i in aps:
-        ap_distance = get_distance(i) 
+        ap_distance = get_distance(i)
         if ap_distance != -1:
             distance[i] = ap_distance
     return distance
@@ -69,22 +72,22 @@ def get_aps(platform, interface='wlan0'):
         scan_out_lines = str(scan_out).split("\\n")[1:-1]
         for each_line in scan_out_lines:
             split_line = [e for e in each_line.split(" ") if e != ""]
-            
+
             line_data = {"SSID": split_line[0], "RSSI": int(split_line[2]), "channel": split_line[3], "HT": (
                 split_line[4] == "Y"), "CC": split_line[5], "security": split_line[6]}
             scan_out_data[split_line[1]] = line_data
         return scan_out_data
-    
+
     raise NotImplementedError("Platform not found")
 
-def get_distance(ap_mac: str ):
+
+def get_distance(ap_mac: str):
     nearby_aps = get_aps(get_os())
     if ap_mac not in nearby_aps.keys():
         print(f"{ap_mac} Specified Access Point Not Found!")
-        return -1  # Using -1 top indicate an error
+        return -1  
     ap_rssi = nearby_aps[ap_mac]["RSSI"]
     distance = compute_distance(ap_rssi)
-    # Replace this with your equation
     return distance
 
 
@@ -93,9 +96,8 @@ def compute_distance(ap_rssi: int) -> int:
         assert ap_rssi < 0
         distance = -log10(3*((ap_rssi + 81)**9.9)) + 19.7
         return distance
-    except :
+    except:
         raise ValueError("Invalid RSSI")
-
 
 
 if __name__ == "__main__":
