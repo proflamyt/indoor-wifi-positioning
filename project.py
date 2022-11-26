@@ -1,7 +1,6 @@
 import subprocess
 from math import log10
 import sys
-from wincode import get_wirelessInfo
 import argparse
 
 my_parser = argparse.ArgumentParser(
@@ -42,7 +41,9 @@ def get_os():
 
 
 def get_aps(platform, interface='wlan0'):
+    
     if platform == 'win32':
+        from wincode import get_wirelessInfo
         return get_wirelessInfo()
 
     if platform == 'linux' or platform == 'linux2':
@@ -52,16 +53,20 @@ def get_aps(platform, interface='wlan0'):
         scan_out_data = {}
         scan_out_lines = str(scan_out).split(r'\n')[1:-2]
         for each_line in scan_out_lines:
+            if 'ESSID' in each_line:
+                bssid = each_line.split(':')[1].strip("\"")
+                scan_out_data[bssid] = {}
+                scan_out_data[bssid].update(address)
+                scan_out_data[bssid].update(signal)
             if 'Address' in each_line:
-                bssid = each_line.split(': ')[0].strip()
-                scan_out_data[bssid] = {
+                address = {
                     "ap_mac": each_line.split(': ')[1].strip()}
 
             if 'Signal' in each_line:
                 level = each_line.split("level=")[1].strip()
-                scan_out_data[bssid] = {
+                signal = {
                     "RSSI": int(level.split(" ")[0])}
-
+        
         return scan_out_data
 
     if platform == 'mac':
