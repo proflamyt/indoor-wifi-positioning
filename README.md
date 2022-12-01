@@ -1,7 +1,7 @@
 # Indoor localization using Wireless access points
     
 
-#### Video Demo:  <https://youtu.be/e-RHlSTMgfE>
+
 #### Description:
 
 Takes in an access point name as a command line argument and measures the distance between the said access point and the device using RSSI (Received Signal Strength Indicator) .
